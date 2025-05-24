@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  
+
   backend:
     build:
       context: ./backend  
@@ -22,7 +22,6 @@ services:
       - mylearnapp-network
     restart: unless-stopped
 
- 
   frontend:
     build:
       context: ./frontend
@@ -45,7 +44,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_DATABASE=${DB_NAME:-mylearnapp}
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
@@ -56,6 +55,23 @@ services:
       - mylearnapp-network
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: mylearnapp-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=${DB_USERNAME:-root}
+      - PMA_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - mylearnapp-network
+    restart: unless-stopped
 
 volumes:
   mysql-data:
